@@ -2,11 +2,10 @@
 
 #include <cstdlib>
 #include <ctime>
-
 #include <string>
 #include <fstream>
 
-static const int NUMBER_ATTEMPTS = 6; 
+#include "constants.h"
 
 Model::Model(View& view, Controller& controller) :
     mView(view),
@@ -42,10 +41,10 @@ void Model::playLevel() {
 
     const std::string word = getRandomWord();
 
-    std::vector<View::Letter> viewLine (5);
+    std::vector<View::Letter> viewLine (WORD_LENGTH);
 
     std::string guess;
-    for (int guessNumber = 0; guessNumber < NUMBER_ATTEMPTS; ++guessNumber) {
+    for (int guessNumber = 0; guessNumber < MAX_NUM_GUESSES; ++guessNumber) {
 
         mView.askForNextWord();
 
@@ -64,7 +63,7 @@ void Model::playLevel() {
         std::string word_copy = word;
 
         bool correctWord = true;
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < WORD_LENGTH; ++i) {
             viewLine[i].letter = guess[i];
             viewLine[i].colour = View::Colour::GRAY;
 
@@ -76,13 +75,13 @@ void Model::playLevel() {
             }
         }
 
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < WORD_LENGTH; ++i) {
 
             if (viewLine[i].colour == View::Colour::GREEN) {
                 continue;
             }
 
-            for (int j = 0; j < 5; ++j) {
+            for (int j = 0; j < WORD_LENGTH; ++j) {
                 if (guess[i] == word_copy[j]) {
                     viewLine[i].colour = View::Colour::YELLOW;
                     word_copy[j] = '_';
@@ -113,7 +112,7 @@ std::string Model::getRandomWord() {
 }
 
 bool Model::isValidWord(const std::string& word) {
-    if (word.length() != 5) {
+    if (word.length() != WORD_LENGTH) {
         return false;
     }
 
@@ -132,7 +131,7 @@ std::unordered_set<std::string> Model::generateWords(const std::string& filename
     while (!fileStream.eof()) {
         getline(fileStream, line);
 
-        if (line.length() != 5) {
+        if (line.length() != WORD_LENGTH) {
             throw std::runtime_error("Word dictionary is invalid");
         }
 
